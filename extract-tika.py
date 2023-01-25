@@ -54,7 +54,7 @@ def extractText(fileIn, fileOut):
     # Try to parse the file with Tika, and report an error message if
     # parsing fails
     try:
-        parsed = parser.from_file(fileIn)
+        parsed = parser.from_file(fileIn, service='text')
         successParse = True
     except:
         successParse = False
