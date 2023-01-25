@@ -11,8 +11,6 @@ import os
 import sys
 import argparse
 import tika
-tika.initVM()
-from tika import parser
 
 # Create argument parser
 argParser = argparse.ArgumentParser(
@@ -54,7 +52,7 @@ def extractText(fileIn, fileOut):
     # Try to parse the file with Tika, and report an error message if
     # parsing fails
     try:
-        parsed = parser.from_file(fileIn, service='text')
+        parsed = tika.parser.from_file(fileIn, service='text')
         successParse = True
     except:
         successParse = False
@@ -101,6 +99,9 @@ def main():
     if not os.path.isdir(dirOut):
         msg = "output dir doesn't exist"
         errorExit(msg)
+
+    # Initialize Tika
+    tika.initVM()
 
     # Iterate over files in input directory
     for filename in os.listdir(dirIn):
