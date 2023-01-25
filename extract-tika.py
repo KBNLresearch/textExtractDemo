@@ -11,6 +11,7 @@ import os
 import sys
 import argparse
 import tika
+from tika import parser
 
 # Create argument parser
 argParser = argparse.ArgumentParser(
@@ -52,9 +53,11 @@ def extractText(fileIn, fileOut):
     # Try to parse the file with Tika, and report an error message if
     # parsing fails
     try:
-        parsed = tika.parser.from_file(fileIn, service='text')
+        parsed = parser.from_file(fileIn, service='text')
+        #parsed = parser.from_file(fileIn, xmlContent=True)
         successParse = True
     except:
+        raise
         successParse = False
         msg = "error parsing " + fileIn
         errorInfo(msg)
