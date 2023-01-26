@@ -118,5 +118,6 @@ def main():
                 fOutTika = os.path.join(dirOut, baseName + "_tika.txt")
                 extractTika(fIn, fOutTika)
 
+
 if __name__ == "__main__":
     main()
