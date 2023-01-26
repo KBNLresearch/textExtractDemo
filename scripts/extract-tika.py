@@ -15,7 +15,8 @@ from tika import parser
 
 # Create argument parser
 argParser = argparse.ArgumentParser(
-    description="Extract text from EPUB file ")
+    description="Extract text from EPUB files")
+
 
 def parseCommandLine():
     """Parse command-line arguments"""
@@ -46,9 +47,9 @@ def errorInfo(msg):
     sys.stderr.write("ERROR: " + msg + "\n")
 
 
-def extractText(fileIn, fileOut):
-    """Extract text from input file and write
-    result to output file"""
+def extractTika(fileIn, fileOut):
+    """Extract text from input file using Tika
+    and write result to output file"""
 
     # Try to parse the file with Tika, and report an error message if
     # parsing fails
@@ -56,7 +57,7 @@ def extractText(fileIn, fileOut):
         parsed = parser.from_file(fileIn, service='text')
         #parsed = parser.from_file(fileIn, xmlContent=True)
         successParse = True
-    except:
+    except Exception:
         raise
         successParse = False
         msg = "error parsing " + fileIn
@@ -67,22 +68,19 @@ def extractText(fileIn, fileOut):
         content = parsed["content"]
 
         try:
+            # TODO: test behaviour here if extracted content has a decoding that
+            # is not UTF-8 (EPUB 2 and EPUB 3 also allow UTF-16!)
             with open(fileOut, 'w', encoding='utf-8') as fout:
                 fout.write(content)
-            # TODO: what happens here if extracted content has a decoding that
-            # is not UTF-8? Or are the text strings returned by Tika UTF-8 by default?
-            #
-            # Important, because EPUB allows both UTF-8 and UTF-16:
-            #
-            # EPUB 2 (https://idpf.org/epub/20/spec/OPS_2.0.1_draft.htm):
-            # "Publications may use the entire Unicode character set, using UTF-8 or UTF-16 encodings"
-            #
-            # EPUB 3 (https://www.w3.org/TR/epub-33/#sec-xml-constraints):
-            # "Any publication resource that is an XML-based media type [rfc2046] (...) MUST be encoded in
-            # UTF-8 or UTF-16 [unicode], with UTF-8 as the RECOMMENDED encoding.""
-            #
-        except:
+        except UnicodeError:
+            msg = "Unicode error on writing " + fileOut
+            errorInfo(msg)    
+        except OSError:
             msg = "error writing " + fileOut
+            errorInfo(msg)
+        except Exception:
+            raise
+            msg = "unknown error writing " + fileOut
             errorInfo(msg)
 
 
@@ -117,9 +115,8 @@ def main():
             # Only process files with .epub extension (case-insensitive,
             # just to be safe)
             if extension.upper() == ".EPUB":
-                fOut = os.path.join(dirOut, baseName + ".txt")
-                extractText(fIn, fOut)
-
+                fOutTika = os.path.join(dirOut, baseName + "_tika.txt")
+                extractTika(fIn, fOutTika)
 
 if __name__ == "__main__":
     main()
