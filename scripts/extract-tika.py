@@ -24,7 +24,7 @@ def parseCommandLine():
     argParser.add_argument('dirIn',
                                action="store",
                                type=str,
-                               help='directory with input EPUB file')
+                               help='directory with input EPUB files')
 
     argParser.add_argument('dirOut',
                                action='store',
