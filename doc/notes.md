@@ -159,7 +159,6 @@ with open(fileOut, 'w', encoding='utf-8') as fout:
 BUT for DBNL books "content" is empty in most cases (zero-byte bytes object) or just a few words. It did work OK with the Standard Ebooks examples I tried, no idea why.
 
 
-
 ## Handling of whitespace characters
 
 Example:
@@ -228,12 +227,24 @@ positional arguments:
 - dirOut: output directory
 - -h, --help:  show help message and exit
 
+### Ebooklib script
+
+```
+python3 extract-ebooklib.py [-h] dirIn dirOut
+```
+positional arguments:
+
+- dirIn: directory with input EPUB files
+- dirOut: output directory
+- -h, --help:  show help message and exit
+
+
 ### Examples
 
 Tika:
 
 ```
-python3 ./textExtractDemo/scripts/extract-tika.py DBNL_EPUBS_moderneromans/ out-dbnl/
+python3 ./textExtractDemo/scripts/extract-tika.py DBNL_EPUBS_moderneromans/ out-dbnl/ -t
 ```
 
 Textract:
@@ -241,4 +252,45 @@ Textract:
 ```
 python3 ./textExtractDemo/scripts/extract-textract.py DBNL_EPUBS_moderneromans/ out-dbnl/
 ```
+
+Ebooklib:
+
+```
+python3 ./textExtractDemo/scripts/extract-ebooklib.py DBNL_EPUBS_moderneromans/ out-dbnl/
+```
+
+## Word counts DBNL
+
+|fileName|Tika|Textract|Ebooklib|
+|:--|:--|:--|:--|
+|eern001lief01_01.epub|25450|1|25446|
+|spro002mure01_01.epub|50553|0|50549|
+|berk011veel01_01.epub|67978|0|67974|
+|sche034drie01_01.epub|203853|3|203352|
+|jous010supe01_01.epub|202495|0|202491|
+|dele035wegv01_01.epub|76536|0|76530|
+|verv017eerl01_01.epub|33844|0|33840|
+|dhae007euro01_01.epub|394455|2|394400|
+|gomm002uurw01_01.epub|43754|0|43731|
+|gang009lalb01_01.epub|28453|4|28381|
+|geel005bloe01_01.epub|76316|0|76312|
+|hart008droo02_01.epub|77283|0|77279|
+|eede003vand04_01.epub|120481|6|120310|
+|meij031tuss02_01.epub|145678|4|145665|
+|maas013blau01_01.epub|55099|0|55093|
+
+## Word counts Standard Ebooks
+
+|fileName|Tika|Textract|Ebooklib|
+|:--|:--|:--|:--|
+|william-shakespeare_king-lear.epub|28442|18621|28430|
+|david-garnett_lady-into-fox.epub|25240|25223|25228|
+|joseph-conrad_heart-of-darkness.epub|38717|38698|38705|
+|anthony-trollope_the-dukes-children.epub|223014|222995|223002|
+|agatha-christie_the-mysterious-affair-at-styles.epub|57401|57229|57271|
+|edgar-allan-poe_the-narrative-of-arthur-gordon-pym-of-nantucket.epub|71931|71837|71863|
+|p-g-wodehouse_short-fiction.epub|212224|212182|212212|
+|robert-louis-stevenson_the-strange-case-of-dr-jekyll-and-mr-hyde.epub|26370|26345|26358|
+|h-g-wells_the-time-machine.epub|33044|33024|33032|
+|thorstein-veblen_the-theory-of-the-leisure-class.epub|106537|106515|106525|
 
