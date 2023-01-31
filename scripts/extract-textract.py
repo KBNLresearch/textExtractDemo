@@ -9,6 +9,7 @@ https://github.com/deanmalmgren/textract
 
 import os
 import sys
+import csv
 import argparse
 import textract
 
@@ -64,6 +65,8 @@ def extractTextract(fileIn, fileOut):
 
     # Write extracted text to a text file if parsing was successful    
     if successParse:
+        # Word count
+        noWords = len(content.split())
         try:
             with open(fileOut, 'w', encoding='utf-8') as fout:
                 fout.write(content)
@@ -77,6 +80,8 @@ def extractTextract(fileIn, fileOut):
             raise
             msg = "unknown error writing " + fileOut
             errorInfo(msg)
+
+    return noWords
 
 
 def main():
@@ -96,6 +101,10 @@ def main():
         msg = "output dir doesn't exist"
         errorExit(msg)
 
+    # Summary output file
+    csvOut = os.path.join(dirOut, "summary-textract.csv")
+    csvList = [["fileName", "noWords"]]
+
     # Iterate over files in input directory
     for filename in os.listdir(dirIn):
         fIn = os.path.abspath(os.path.join(dirIn, filename))
@@ -108,7 +117,25 @@ def main():
             # just to be safe)
             if extension.upper() == ".EPUB":
                 fOutTextract = os.path.join(dirOut, baseName + "_textract.txt")
-                extractTextract(fIn, fOutTextract)
+                noWords = extractTextract(fIn, fOutTextract)
+                csvList.append([filename, noWords])
+
+    # Write summary file
+    try:
+        with open(csvOut, 'w', encoding='utf-8') as csvout:
+            csvWriter = csv.writer(csvout)
+            for row in csvList:
+                csvWriter.writerow(row)
+    except UnicodeError:
+        msg = "Unicode error on writing " + csvOut
+        errorInfo(msg)    
+    except OSError:
+        msg = "error writing " + csvOut
+        errorInfo(msg)
+    except Exception:
+        raise
+        msg = "unknown error writing " + csvOut
+        errorInfo(msg)
 
 
 if __name__ == "__main__":

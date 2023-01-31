@@ -157,3 +157,88 @@ with open(fileOut, 'w', encoding='utf-8') as fout:
 ```
 
 BUT for DBNL books "content" is empty in most cases (zero-byte bytes object) or just a few words. It did work OK with the Standard Ebooks examples I tried, no idea why.
+
+
+
+## Handling of whitespace characters
+
+Example:
+
+[The Strange Case of Dr. Jekyll and Mr. Hyde](https://standardebooks.org/ebooks/robert-louis-stevenson/the-strange-case-of-dr-jekyll-and-mr-hyde/downloads/robert-louis-stevenson_the-strange-case-of-dr-jekyll-and-mr-hyde.epub)
+
+Tika output:
+
+
+```
+			The pair walked on again for a while in silence; and then “Enfield,” said Mr. Utterson, “that’s a good rule of yours.”
+
+			“Yes, I think it is,” returned Enfield.
+
+```
+
+Textract output:
+
+```
+The pair walked on again for a while in silence; and then “Enfield,” said Mr. Utterson, “that’s a good rule of yours.”
+“Yes, I think it is,” returned Enfield.
+```
+
+Xhtml source:
+
+```xhtml
+			<p>The pair walked on again for a while in silence; and then “Enfield,” said <abbr>Mr.</abbr> Utterson, “that’s a good rule of yours.”</p>
+			<p>“Yes, I think it is,” returned Enfield.</p>
+```
+
+Note how the tab characters in the Xhtml source file are added to the extracted text by Tika. On the other hand, Textract only extracts the text that is *inside* the paragraph element (ignoring any indentation of the XHTML source).
+
+If this is a problem: split Tika output into separate lines, and then trim leading/trailing whitespace characters. See demo script.
+
+
+## Word counts
+
+King Lear: 28442 words with Tika, 18621 with Textract!
+
+## Demo scripts
+
+Iterate over all files with .epub extension in input directory, and write extracted text to text files in output directory. Also writes summary file with word count for each EPUB.
+
+### Tika script
+
+Usage:
+
+```
+python3 extract-tika.py [-h] [--trim] dirIn dirOut
+```
+positional arguments:
+
+- dirIn: directory with input EPUB files
+- dirOut: output directory
+- --trim, -t: trim leading and trailing whitespace from Tika output
+- -h, --help:  show help message and exit
+
+### Textract script
+
+```
+python3 extract-textract.py [-h] dirIn dirOut
+```
+positional arguments:
+
+- dirIn: directory with input EPUB files
+- dirOut: output directory
+- -h, --help:  show help message and exit
+
+### Examples
+
+Tika:
+
+```
+python3 ./textExtractDemo/scripts/extract-tika.py DBNL_EPUBS_moderneromans/ out-dbnl/
+```
+
+Textract:
+
+```
+python3 ./textExtractDemo/scripts/extract-textract.py DBNL_EPUBS_moderneromans/ out-dbnl/
+```
+
