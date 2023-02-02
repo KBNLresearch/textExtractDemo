@@ -52,13 +52,15 @@ def extractTextract(fileIn, fileOut):
     """Extract text from input file using Textract
     and write result to output file"""
 
+    # Word count
+    noWords = 0
+
     # Try to parse the file with Textract, and report an error message if
     # parsing fails
     try:
         content = textract.process(fileIn, encoding='utf-8').decode()
         successParse = True
     except Exception:
-        raise
         successParse = False
         msg = "error parsing " + fileIn
         errorInfo(msg)
@@ -77,7 +79,6 @@ def extractTextract(fileIn, fileOut):
             msg = "error writing " + fileOut
             errorInfo(msg)
         except Exception:
-            raise
             msg = "unknown error writing " + fileOut
             errorInfo(msg)
 
@@ -133,7 +134,6 @@ def main():
         msg = "error writing " + csvOut
         errorInfo(msg)
     except Exception:
-        raise
         msg = "unknown error writing " + csvOut
         errorInfo(msg)
 

@@ -32,12 +32,6 @@ def parseCommandLine():
                                type=str,
                                help='output directory')
 
-    argParser.add_argument('--trim', '-t',
-                               action="store_true",
-                               dest='trimFlag',
-                               default=False,
-                               help="trim leading and trailing whitespace from Tika output")
-
     # Parse arguments
     args = argParser.parse_args()
 
@@ -55,7 +49,7 @@ def errorInfo(msg):
     sys.stderr.write("ERROR: " + msg + "\n")
 
 
-def extractTika(fileIn, fileOut, trimFlag):
+def extractTika(fileIn, fileOut):
     """Extract text from input file using Tika
     and write result to output file"""
 
@@ -63,33 +57,23 @@ def extractTika(fileIn, fileOut, trimFlag):
     # parsing fails
     try:
         parsed = parser.from_file(fileIn, service='text')
-        #parsed = parser.from_file(fileIn, xmlContent=True)
         successParse = True
     except Exception:
-        raise
         successParse = False
         msg = "error parsing " + fileIn
         errorInfo(msg)
 
-    # Write extracted text to a text file if parsing was successful    
+    # Write extracted text to a text file if parsing was successful   
     if successParse:
         content = parsed["content"]
         # Word count
         noWords = 0
-        # Split content string into separate lines
-        # so we can do some processing id needed
-        lines = content.splitlines()
+
         try:
-            # TODO: test behaviour here if extracted content has a decoding that
-            # is not UTF-8 (EPUB 2 and EPUB 3 also allow UTF-16!)
             with open(fileOut, 'w', encoding='utf-8') as fout:
-                for line in lines:
-                    if trimFlag:
-                        # Trim leading / trailing whitespace characters
-                        line = line.strip()
-                    # Update word count
-                    noWords += len(line.split())
-                    fout.write(line + '\n')
+                noWords = len(content.split())
+                with open(fileOut, 'w', encoding='utf-8') as fout:
+                    fout.write(content)
         except UnicodeError:
             msg = "Unicode error on writing " + fileOut
             errorInfo(msg)    
@@ -97,10 +81,9 @@ def extractTika(fileIn, fileOut, trimFlag):
             msg = "error writing " + fileOut
             errorInfo(msg)
         except Exception:
-            raise
             msg = "unknown error writing " + fileOut
             errorInfo(msg)
-    
+
     return noWords
 
 
@@ -111,7 +94,6 @@ def main():
     args = parseCommandLine()
     dirIn = args.dirIn
     dirOut = args.dirOut
-    trimFlag = args.trimFlag
 
     # Check if input and output directories exist, and exit if not
     if not os.path.isdir(dirIn):
@@ -141,7 +123,7 @@ def main():
             # just to be safe)
             if extension.upper() == ".EPUB":
                 fOutTika = os.path.join(dirOut, baseName + "_tika.txt")
-                noWords = extractTika(fIn, fOutTika, trimFlag)
+                noWords = extractTika(fIn, fOutTika)
                 csvList.append([filename, noWords])
 
     # Write summary file
@@ -157,7 +139,6 @@ def main():
         msg = "error writing " + csvOut
         errorInfo(msg)
     except Exception:
-        raise
         msg = "unknown error writing " + csvOut
         errorInfo(msg)
 

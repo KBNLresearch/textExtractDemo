@@ -62,6 +62,9 @@ def extractEbooklib(fileIn, fileOut):
     """Extract text from input file using Ebooklib
     and write result to output file"""
 
+    # Word count
+    noWords = 0
+
     # Try to parse the file with Ebooklib, and report an error message if
     # parsing fails
     try:
@@ -77,7 +80,6 @@ def extractEbooklib(fileIn, fileOut):
 
         successParse = True
     except Exception:
-        raise
         successParse = False
         msg = "error parsing " + fileIn
         errorInfo(msg)
@@ -96,7 +98,6 @@ def extractEbooklib(fileIn, fileOut):
             msg = "error writing " + fileOut
             errorInfo(msg)
         except Exception:
-            raise
             msg = "unknown error writing " + fileOut
             errorInfo(msg)
 
@@ -152,7 +153,6 @@ def main():
         msg = "error writing " + csvOut
         errorInfo(msg)
     except Exception:
-        raise
         msg = "unknown error writing " + csvOut
         errorInfo(msg)
 

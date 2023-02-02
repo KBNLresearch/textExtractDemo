@@ -101,7 +101,7 @@ parsed = parser.from_file(fileIn, xmlContent=True)
 Even though this does preserve the internal document structure, it's still not that straightforward to identify things like footnotes, because they're not explicitly tagged. See below example: 
 
 ```html
-<div class="voetnoten"><a class="footnote-link zz_voetnootcijfer" href="dhae007euro01_01-0003.xhtml#n001T" id="n001">1</a>Voor Nieuwenhuys is de conversatie, zelfs de roddel, de belangrijkste ontstaansgrond, maar daarbij heeft hij uiteraard de latere koloniale samenleving (negentiende en begin twintigste eeuw) in gedachten.</div>
+<div class="voetnoten"><a class="footnote-link zz_voetnootcijfer" href="dhae007euro01_01-0003.xhtml#n001T" id="n001">1</a>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</div>
 ```
 
 Here the footnote is wrapped inside a *div* element, where the value of the *class*  attribute identifies it as a footnote. But the *class* values are not in any way standardized, and there are no controlled vocabularies for this. So the implementation will vary from one publisher to another. See also:
@@ -141,7 +141,7 @@ ERROR: pdfx 1.4.1 has requirement chardet==4.0.0, but you'll have chardet 3.0.4 
 ERROR: pdfx 1.4.1 has requirement pdfminer.six==20201018, but you'll have pdfminer-six 20191110 which is incompatible.
 ```
 
-As these are all pdf-related, so I'm assuming they won't affect EPUB behaviour.
+Because of these dependency conflicts I re-installed in a virtual environment as described [here](https://towardsdatascience.com/virtual-environments-104c62d48c54).
 
 Basic usage:
 
@@ -158,40 +158,9 @@ with open(fileOut, 'w', encoding='utf-8') as fout:
 
 BUT for DBNL books "content" is empty in most cases (zero-byte bytes object) or just a few words. It did work OK with the Standard Ebooks examples I tried, no idea why.
 
+Submitted an issue:
 
-## Handling of whitespace characters
-
-Example:
-
-[The Strange Case of Dr. Jekyll and Mr. Hyde](https://standardebooks.org/ebooks/robert-louis-stevenson/the-strange-case-of-dr-jekyll-and-mr-hyde/downloads/robert-louis-stevenson_the-strange-case-of-dr-jekyll-and-mr-hyde.epub)
-
-Tika output:
-
-
-```
-			The pair walked on again for a while in silence; and then “Enfield,” said Mr. Utterson, “that’s a good rule of yours.”
-
-			“Yes, I think it is,” returned Enfield.
-
-```
-
-Textract output:
-
-```
-The pair walked on again for a while in silence; and then “Enfield,” said Mr. Utterson, “that’s a good rule of yours.”
-“Yes, I think it is,” returned Enfield.
-```
-
-Xhtml source:
-
-```xhtml
-			<p>The pair walked on again for a while in silence; and then “Enfield,” said <abbr>Mr.</abbr> Utterson, “that’s a good rule of yours.”</p>
-			<p>“Yes, I think it is,” returned Enfield.</p>
-```
-
-Note how the tab characters in the Xhtml source file are added to the extracted text by Tika. On the other hand, Textract only extracts the text that is *inside* the paragraph element (ignoring any indentation of the XHTML source).
-
-If this is a problem: split Tika output into separate lines, and then trim leading/trailing whitespace characters. See demo script.
+<https://github.com/deanmalmgren/textract/issues/455>
 
 
 ## Word counts
@@ -213,7 +182,6 @@ positional arguments:
 
 - dirIn: directory with input EPUB files
 - dirOut: output directory
-- --trim, -t: trim leading and trailing whitespace from Tika output
 - -h, --help:  show help message and exit
 
 ### Textract script
@@ -244,7 +212,7 @@ positional arguments:
 Tika:
 
 ```
-python3 ./textExtractDemo/scripts/extract-tika.py DBNL_EPUBS_moderneromans/ out-dbnl/ -t
+python3 ./textExtractDemo/scripts/extract-tika.py DBNL_EPUBS_moderneromans/ out-dbnl/
 ```
 
 Textract:
@@ -294,3 +262,24 @@ python3 ./textExtractDemo/scripts/extract-ebooklib.py DBNL_EPUBS_moderneromans/ 
 |h-g-wells_the-time-machine.epub|33044|33024|33032|
 |thorstein-veblen_the-theory-of-the-leisure-class.epub|106537|106515|106525|
 
+## Test if all output is valid UTF-8
+
+Use [isutf8](https://manpages.debian.org/unstable/moreutils/isutf8.1.en.html) tool[^1]:
+```
+isutf8 ./out-dbnl/*.txt
+isutf8 ./out-se/*.txt
+```
+
+OK!
+
+## Some differences
+
+- Tika output contains image placeholders with alt-text descriptions(`[image: DBNL]`) that do not appear in output of either Ebooklib or Textract.
+- Tika inserts newlines between sections; Ebooklib  and Textract don't
+- Tika and Ebooklib output may contain leading whitespace characters (spaces or tabs). Textract strips these away.
+- Textract fails to extract any text at all for most of the DBNL EPUBs (and in the best case only just a few words). Submitted an [issue](https://github.com/deanmalmgren/textract/issues/455) for this.
+- Textract does a better job for the Standard Ebooks EPUBS. But even there, looking at the King Lear EPUB (Standard Ebooks), the word count for the Textract output is about 10 thousand words lower than the Tika/Ebooklib outputs! Not entirely sure why this is, but cursory look reveals that e.g. Table of Contents is missing from Textract output, even though it is included in the Tika and Ebooklib output.
+
+
+
+[^1]: To install, run `sudo apt-get install moreutils`
