@@ -9,7 +9,7 @@
 
 ## Demo scripts
 
-Each of these demo scripts iterates over files with an .epub extension in a user-defined input directory. For each of these files, it extracts the text, and writes the extracted text (using UTF-8 encoding) to a file in a user-defined output directory.
+Each of these demo scripts iterates over files with an .epub extension in a user-defined input directory. For each of these files, it extracts the text, and writes the extracted text (using UTF-8 encoding) to a file in a user-defined output directory. It also writes a summary file with the word count for each EPUB.
 
 ## Tika-python script
 
