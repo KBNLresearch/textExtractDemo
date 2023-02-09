@@ -53,6 +53,9 @@ def extractTika(fileIn, fileOut):
     """Extract text from input file using Tika
     and write result to output file"""
 
+    # Word count
+    noWords = 0
+
     # Try to parse the file with Tika, and report an error message if
     # parsing fails
     try:
@@ -66,8 +69,6 @@ def extractTika(fileIn, fileOut):
     # Write extracted text to a text file if parsing was successful   
     if successParse:
         content = parsed["content"]
-        # Word count
-        noWords = 0
 
         try:
             with open(fileOut, 'w', encoding='utf-8') as fout:
