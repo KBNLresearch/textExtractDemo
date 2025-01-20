@@ -1,18 +1,17 @@
 #! /usr/bin/env python3
 """
-EPUB text extraction with Apache Tika demo
+EPUB text extraction with MUPDF demo
 
-Requires tika-python:
+Requires PyMuPDF (version => 1.24.3):
 
-https://github.com/chrismattmann/tika-python
+https://pymupdf.readthedocs.io/
 """
 
 import os
 import sys
 import argparse
 import csv
-import tika
-from tika import parser
+import pymupdf
 
 # Create argument parser
 argParser = argparse.ArgumentParser(
@@ -49,18 +48,20 @@ def errorInfo(msg):
     sys.stderr.write("ERROR: " + msg + "\n")
 
 
-def extractTika(fileIn, fileOut):
-    """Extract text from input file using Tika
+def extractPyMuPDF(fileIn, fileOut):
+    """Extract text from input file using PyMuPDF
     and write result to output file"""
 
     # Word count
     noWords = 0
 
-    # Try to parse the file with Tika, and report an error message if
+    # Try to parse the file with PyMuPDF, and report an error message if
     # parsing fails
     try:
-        parsed = parser.from_file(fileIn, service='text')
-        successParse = True
+        with pymupdf.open(fileIn) as doc:
+            content = chr(12).join([page.get_text() for page in doc])
+            successParse = True
+            #pathlib.Path(fname + ".txt").write_bytes(text.encode())
     except Exception:
         successParse = False
         msg = "error parsing " + fileIn
@@ -68,12 +69,11 @@ def extractTika(fileIn, fileOut):
 
     # Write extracted text to a text file if parsing was successful   
     if successParse:
-        content = parsed["content"]
-
         try:
-            noWords = len(content.split())
             with open(fileOut, 'w', encoding='utf-8') as fout:
-                fout.write(content)
+                noWords = len(content.split())
+                with open(fileOut, 'w', encoding='utf-8') as fout:
+                    fout.write(content)
         except UnicodeError:
             msg = "Unicode error on writing " + fileOut
             errorInfo(msg)    
@@ -105,11 +105,8 @@ def main():
         errorExit(msg)
 
     # Summary output file
-    csvOut = os.path.join(dirOut, "summary-tika.csv")
+    csvOut = os.path.join(dirOut, "summary-mupdf.csv")
     csvList = [["fileName", "noWords"]]
-
-    # Initialize Tika
-    tika.initVM()
 
     # Iterate over files in input directory
     for filename in os.listdir(dirIn):
@@ -122,8 +119,8 @@ def main():
             # Only process files with .epub extension (case-insensitive,
             # just to be safe)
             if extension.upper() == ".EPUB":
-                fOutTika = os.path.join(dirOut, baseName + "_tika.txt")
-                noWords = extractTika(fIn, fOutTika)
+                fOutMuPDF = os.path.join(dirOut, baseName + "_mupdf.txt")
+                noWords = extractPyMuPDF(fIn, fOutMuPDF)
                 csvList.append([filename, noWords])
 
     # Write summary file
