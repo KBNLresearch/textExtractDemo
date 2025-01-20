@@ -10,9 +10,10 @@ fileOut = "/home/johan/kb/epub-tekstextractie/out-dbnl-2025/test-pymupdf.txt"
 # parsing fails
 try:
     with pymupdf.open(fileIn) as doc:
-        content = chr(12).join([page.get_text() for page in doc])
+        content = ""
+        for page in doc:
+            content += page.get_text()
         successParse = True
-        #pathlib.Path(fname + ".txt").write_bytes(text.encode())
 except Exception:
     successParse = False
     msg = "error parsing " + fileIn
@@ -21,10 +22,9 @@ except Exception:
 # Write extracted text to a text file if parsing was successful   
 if successParse:
     try:
+        noWords = len(content.split())
         with open(fileOut, 'w', encoding='utf-8') as fout:
-            noWords = len(content.split())
-            with open(fileOut, 'w', encoding='utf-8') as fout:
-                fout.write(content)
+            fout.write(content)
     except UnicodeError:
         msg = "Unicode error on writing " + fileOut
         errorInfo(msg)    
@@ -33,4 +33,5 @@ if successParse:
         errorInfo(msg)
     except Exception:
         msg = "unknown error writing " + fileOut
+        raise
         print(msg)

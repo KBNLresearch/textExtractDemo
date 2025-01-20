@@ -59,9 +59,10 @@ def extractPyMuPDF(fileIn, fileOut):
     # parsing fails
     try:
         with pymupdf.open(fileIn) as doc:
-            content = chr(12).join([page.get_text() for page in doc])
+            content = ""
+            for page in doc:
+                content += page.get_text()
             successParse = True
-            #pathlib.Path(fname + ".txt").write_bytes(text.encode())
     except Exception:
         successParse = False
         msg = "error parsing " + fileIn
@@ -70,10 +71,9 @@ def extractPyMuPDF(fileIn, fileOut):
     # Write extracted text to a text file if parsing was successful   
     if successParse:
         try:
+            noWords = len(content.split())
             with open(fileOut, 'w', encoding='utf-8') as fout:
-                noWords = len(content.split())
-                with open(fileOut, 'w', encoding='utf-8') as fout:
-                    fout.write(content)
+                fout.write(content)
         except UnicodeError:
             msg = "Unicode error on writing " + fileOut
             errorInfo(msg)    
