@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 """
-EPUB text extraction with MUPDF demo
+EPUB text extraction with PyMuPDF demo
 
 Requires PyMuPDF (version => 1.24.3):
 
@@ -60,8 +60,18 @@ def extractPyMuPDF(fileIn, fileOut):
     try:
         with pymupdf.open(fileIn) as doc:
             content = ""
-            for page in doc:
-                content += page.get_text()
+            noChapters = doc.chapter_count
+            # Iterate over chapters
+            for i in range(noChapters):
+                chapter_page_count = doc.chapter_page_count(i)
+                chapter_text = ""
+                # Iterate over pages in chapter
+                for j in range(chapter_page_count):
+                    page = doc[(i, j)]
+                    chapter_text += page.get_text()
+                content += chapter_text
+                # Add linebreak to mark end of chapter
+                content += "\n"
             successParse = True
     except Exception:
         successParse = False
