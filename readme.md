@@ -5,6 +5,7 @@
 - [Tika demo script](./scripts/extract-tika.py)
 - [Textract demo script](./scripts/extract-textract.py)
 - [Ebooklib demo script](./scripts/extract-ebooklib.py)
+- [PyMuPDF demo script](./scripts/extract-pymupdf.py)
 - [Working notes](./doc/notes.md)
 
 ## Demo scripts
@@ -16,13 +17,12 @@ Each of these demo scripts iterates over files with an .epub extension in a user
 ### Usage
 
 ```
-python3 extract-tika.py [-h] [--trim] dirIn dirOut
+python3 extract-tika.py dirIn dirOut
 ```
 positional arguments:
 
 - dirIn: directory with input EPUB files
 - dirOut: output directory
-- -h, --help:  show help message and exit
 
 ### Example
 
@@ -35,13 +35,12 @@ python3 ./textExtractDemo/scripts/extract-tika.py DBNL_EPUBS_moderneromans/ out-
 ### Usage
 
 ```
-python3 extract-textract.py [-h] dirIn dirOut
+python3 extract-textract.py dirIn dirOut
 ```
 positional arguments:
 
 - dirIn: directory with input EPUB files
 - dirOut: output directory
-- -h, --help:  show help message and exit
 
 ### Example
 
@@ -54,16 +53,34 @@ python3 ./textExtractDemo/scripts/extract-textract.py DBNL_EPUBS_moderneromans/ 
 ### Usage
 
 ```
-python3 extract-ebooklib.py [-h] dirIn dirOut
+python3 extract-ebooklib.py dirIn dirOut
 ```
 positional arguments:
 
 - dirIn: directory with input EPUB files
 - dirOut: output directory
-- -h, --help:  show help message and exit
 
 ### Example
 
 ```
 python3 ./textExtractDemo/scripts/extract-ebooklib.py DBNL_EPUBS_moderneromans/ out-dbnl/
 ```
+
+## PyMuPDF script
+
+### Usage
+
+```
+python3 extract-pymupdf.py dirIn dirOut
+```
+positional arguments:
+
+- dirIn: directory with input EPUB files
+- dirOut: output directory
+
+### Example
+
+```
+python3 ./textExtractDemo/scripts/extract-pymupdf.py DBNL_EPUBS_moderneromans/ out-dbnl/
+```
+
